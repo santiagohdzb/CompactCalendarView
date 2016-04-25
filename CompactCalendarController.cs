@@ -1,20 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
 using Android.Content;
-using Android.OS;
-using Android.Runtime;
+using Android.Content.Res;
+using Android.Graphics;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
-using Java.Util;
-using Android.Util;
 using Java.Lang;
-using Android.Graphics;
 using Java.Text;
-using Android.Content.Res;
+using Java.Util;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CompactCalendarView
 {
@@ -38,7 +32,7 @@ namespace CompactCalendarView
         private OverScroller scroller;
         private int monthsScrolledSoFar;
         private Date currentDate = new Date();
-		private Java.Util.Locale locale = Java.Util.Locale.Default;
+        private Java.Util.Locale locale = Java.Util.Locale.Default;
         private Calendar currentCalender;
         private Calendar todayCalender;
         private Calendar calendarWithFirstDayOfMonth;
@@ -65,7 +59,7 @@ namespace CompactCalendarView
         private bool isAnimatingIndicator = false;
         private float screenDensity = 1;
         private float growfactorIndicator;
-        VelocityTracker velocityTracker = null;
+        private VelocityTracker velocityTracker = null;
         private int maximumVelocity;
         private float SNAP_VELOCITY_DIP_PER_SECOND = 400;
         private int densityAdjustedSnapVelocity;
@@ -107,17 +101,17 @@ namespace CompactCalendarView
             if (attrs != null && context != null) {
                 TypedArray typedArray = context.Theme.ObtainStyledAttributes(attrs, Resource.Styleable.CompactCalendarView, 0, 0);
                 try {
-					currentDayBackgroundColor = typedArray.GetColor(Resource.Styleable.CompactCalendarView_compactCalendarCurrentDayBackgroundColor, currentDayBackgroundColor);
-					calenderTextColor = typedArray.GetColor(Resource.Styleable.CompactCalendarView_compactCalendarTextColor, calenderTextColor);
-					currentSelectedDayBackgroundColor = typedArray.GetColor(Resource.Styleable.CompactCalendarView_compactCalendarCurrentSelectedDayBackgroundColor, currentSelectedDayBackgroundColor);
-					calenderBackgroundColor = typedArray.GetColor(Resource.Styleable.CompactCalendarView_compactCalendarBackgroundColor, calenderBackgroundColor);
-					textSize = typedArray.GetDimensionPixelSize(Resource.Styleable.CompactCalendarView_compactCalendarTextSize,
-					                                            (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, textSize, context.Resources.DisplayMetrics));
-					targetHeight = typedArray.GetDimensionPixelSize(Resource.Styleable.CompactCalendarView_compactCalendarTargetHeight,
-					                                                (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, targetHeight, context.Resources.DisplayMetrics));
+                    currentDayBackgroundColor = typedArray.GetColor(Resource.Styleable.CompactCalendarView_compactCalendarCurrentDayBackgroundColor, currentDayBackgroundColor);
+                    calenderTextColor = typedArray.GetColor(Resource.Styleable.CompactCalendarView_compactCalendarTextColor, calenderTextColor);
+                    currentSelectedDayBackgroundColor = typedArray.GetColor(Resource.Styleable.CompactCalendarView_compactCalendarCurrentSelectedDayBackgroundColor, currentSelectedDayBackgroundColor);
+                    calenderBackgroundColor = typedArray.GetColor(Resource.Styleable.CompactCalendarView_compactCalendarBackgroundColor, calenderBackgroundColor);
+                    textSize = typedArray.GetDimensionPixelSize(Resource.Styleable.CompactCalendarView_compactCalendarTextSize,
+                                                                (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, textSize, context.Resources.DisplayMetrics));
+                    targetHeight = typedArray.GetDimensionPixelSize(Resource.Styleable.CompactCalendarView_compactCalendarTargetHeight,
+                                                                    (int)TypedValue.ApplyDimension(ComplexUnitType.Sp, targetHeight, context.Resources.DisplayMetrics));
                 }
                 finally {
-					typedArray.Recycle();
+                    typedArray.Recycle();
                 }
             }
         }
@@ -241,7 +235,7 @@ namespace CompactCalendarView
             performMonthScrollCallback();
         }
 
-		public void setLocale(Java.Util.Locale locale)
+        public void setLocale(Java.Util.Locale locale)
         {
             if (locale == null) {
                 throw new IllegalArgumentException("Locale cannot be null");
@@ -290,7 +284,6 @@ namespace CompactCalendarView
             this.dayColumnNames = dayColumnNames;
         }
 
-
         public void setShouldDrawDaysHeader(bool shouldDrawDaysHeader)
         {
             this.shouldDrawDaysHeader = shouldDrawDaysHeader;
@@ -312,7 +305,7 @@ namespace CompactCalendarView
             this.paddingLeft = paddingLeft;
 
             //scale small indicator by screen density
-            smallIndicatorRadius = 2.5f * screenDensity;
+            smallIndicatorRadius = 2f * screenDensity;
 
             //assume square around each day of width and height = heightPerDay and get diagonal line length
             //makes easier to find radius
@@ -359,8 +352,8 @@ namespace CompactCalendarView
                 return;
             }
 
-            int dayColumn = Java.Lang.Math.Round((paddingLeft + e.XPrecision - paddingWidth - paddingRight) / widthPerDay);
-            int dayRow = Java.Lang.Math.Round((e.YPrecision - paddingHeight) / heightPerDay);
+            int dayColumn = Java.Lang.Math.Round((paddingLeft + e.RawX - paddingWidth - paddingRight) / widthPerDay);
+            int dayRow = Java.Lang.Math.Round((e.RawY - paddingHeight) / heightPerDay);
 
             setCalenderToFirstDayOfMonth(calendarWithFirstDayOfMonth, currentDate, -monthsScrolledSoFar, 0);
 
@@ -406,7 +399,8 @@ namespace CompactCalendarView
             return true;
         }
 
-        public bool onTouch(MotionEvent ev) {
+        public bool onTouch(MotionEvent ev)
+        {
             if (velocityTracker == null) {
                 velocityTracker = VelocityTracker.Obtain();
             }
@@ -419,10 +413,12 @@ namespace CompactCalendarView
                 }
 
                 isSmoothScrolling = false;
-            } else if(ev.Action == MotionEventActions.Move) {
+            }
+            else if (ev.Action == MotionEventActions.Move) {
                 velocityTracker.AddMovement(ev);
                 velocityTracker.ComputeCurrentVelocity(500);
-            } else if (ev.Action == MotionEventActions.Up) {
+            }
+            else if (ev.Action == MotionEventActions.Up) {
                 handleHorizontalScrolling();
                 velocityTracker.Recycle();
                 velocityTracker.Clear();
@@ -520,18 +516,20 @@ namespace CompactCalendarView
 
         public int getWeekNumberForCurrentMonth()
         {
-            Calendar calendar = Calendar.GetInstance(locale);
-            calendar.Time = currentDate;
+            var calendar = Calendar.GetInstance(locale);
+                calendar.Time = currentDate;
             return calendar.Get(CalendarField.WeekOfMonth);
         }
 
         public Date getFirstDayOfCurrentMonth()
         {
-            Calendar calendar = Calendar.GetInstance(locale);
-            calendar.Time = currentDate;
-            calendar.Add(CalendarField.Month, -monthsScrolledSoFar);
-            calendar.Set(CalendarField.DayOfMonth, 1);
+            var calendar = Calendar.GetInstance(locale);
+                calendar.Time = currentDate;
+                calendar.Add(CalendarField.Month, -monthsScrolledSoFar);
+                calendar.Set(CalendarField.DayOfMonth, 1);
+
             setToMidnight(calendar);
+
             return calendar.Time;
         }
 
@@ -554,10 +552,11 @@ namespace CompactCalendarView
             calendar.Set(CalendarField.Millisecond, 0);
         }
 
-        public void addEvent(CalendarDayEvent ev) {
+        public void addEvent(CalendarDayEvent ev)
+        {
             eventsCalendar.TimeInMillis = ev.getTimeInMillis();
             string key = getKeyForCalendarEvent(eventsCalendar);
-            List<CalendarDayEvent> uniqCalendarDayEvents = events[key];
+            List<CalendarDayEvent> uniqCalendarDayEvents = events.ContainsKey(key) ? events[key] : null;
 
             if (uniqCalendarDayEvents == null) {
                 uniqCalendarDayEvents = new List<CalendarDayEvent>();
@@ -567,7 +566,7 @@ namespace CompactCalendarView
                 uniqCalendarDayEvents.Add(ev);
             }
 
-            events.Add(key, uniqCalendarDayEvents);
+            events[key] = uniqCalendarDayEvents;
         }
 
         public void addEvents(List<CalendarDayEvent> events)
@@ -695,15 +694,15 @@ namespace CompactCalendarView
 
         public void drawEvents(Canvas canvas, Calendar currentMonthToDrawCalender, int offset)
         {
-			var key = getKeyForCalendarEvent(currentMonthToDrawCalender);
-			List<CalendarDayEvent> uniqCalendarDayEvents = events.ContainsKey(key) ? events[key] : null;
+            var key = getKeyForCalendarEvent(currentMonthToDrawCalender);
+            List<CalendarDayEvent> eventsList = events.ContainsKey(key) ? events[key] : null;
 
             bool shouldDrawCurrentDayCircle = currentMonthToDrawCalender.Get(CalendarField.Month) == todayCalender.Get(CalendarField.Month);
             int todayDayOfMonth = todayCalender.Get(CalendarField.DayOfMonth);
 
-            if (uniqCalendarDayEvents != null) {
-                for (int i = 0; i < uniqCalendarDayEvents.Count; i++) {
-                    CalendarDayEvent ev = uniqCalendarDayEvents.ElementAt(i);
+            if (eventsList != null) {
+                for (int i = 0; i < eventsList.Count; i++) {
+                    CalendarDayEvent ev = eventsList.ElementAt(i);
                     long timeMillis = ev.getTimeInMillis();
                     eventsCalendar.TimeInMillis = timeMillis;
                     int dayOfWeek = getDayOfWeek(eventsCalendar) - 1;
@@ -718,16 +717,54 @@ namespace CompactCalendarView
 
                     int dayOfMonth = eventsCalendar.Get(CalendarField.DayOfMonth);
                     bool isSameDayAsCurrentDay = (todayDayOfMonth == dayOfMonth && shouldDrawCurrentDayCircle);
-                    if (!isSameDayAsCurrentDay) {
-                        if (_showSmallIndicator) {
-                            //draw small indicators below the day in the calendar
-                            drawSmallIndicatorCircle(canvas, xPosition, yPosition + 15, ev.getColor());
-                        }
-                        else {
-                            drawCircle(canvas, xPosition, yPosition, ev.getColor());
-        }
-                    }
+                    float eventSeperation = screenDensity * 3.5f;
+                    float yIndicatorOffset = 12 * screenDensity;
+                    int plusColor = Color.Argb(255, 100, 68, 65);
 
+                    if (eventsList.Count >= 3) {
+                        for (int j = 0, k = -2 ; j < 3; j++, k+=2) {
+                            var evt = eventsList.ElementAt(j);
+                            if (!isSameDayAsCurrentDay) {
+                                if (j == 2) {
+                                    dayPaint.Color = new Color(plusColor);
+                                    float originalWidth = dayPaint.StrokeWidth;
+                                    dayPaint.StrokeWidth = 4;
+                                    canvas.DrawLine(xPosition + (eventSeperation * k), yPosition + yIndicatorOffset, xPosition + (eventSeperation * k) + smallIndicatorRadius , yPosition + yIndicatorOffset, dayPaint);
+                                    canvas.DrawLine(xPosition + (eventSeperation * k), yPosition + yIndicatorOffset, xPosition + (eventSeperation * k) - smallIndicatorRadius , yPosition + yIndicatorOffset, dayPaint);
+                                    canvas.DrawLine(xPosition + (eventSeperation * k), yPosition + yIndicatorOffset, xPosition + (eventSeperation * k), yPosition + yIndicatorOffset + smallIndicatorRadius , dayPaint);
+                                    canvas.DrawLine(xPosition + (eventSeperation * k), yPosition + yIndicatorOffset, xPosition + (eventSeperation * k), yPosition + yIndicatorOffset - smallIndicatorRadius  , dayPaint);
+                                    dayPaint.StrokeWidth = 0;
+                                } else if (_showSmallIndicator) {
+                                    //draw small indicators below the day in the calendar
+                                    drawSmallIndicatorCircle(canvas, xPosition + (eventSeperation * k), yPosition + yIndicatorOffset, evt.getColor());
+                                } else {
+                                    drawCircle(canvas, xPosition + (eventSeperation * k), yPosition, evt.getColor());
+                                }
+                            }
+                        }
+                    } else if (eventsList.Count == 2)  {
+                        for (int j = 0, k = -1 ; j < eventsList.Count; j++, k+=2) {
+                            var evt = eventsList.ElementAt(j);
+                            if (!isSameDayAsCurrentDay) {
+                                if (_showSmallIndicator) {
+                                    //draw small indicators below the day in the calendar
+                                    drawSmallIndicatorCircle(canvas, xPosition + (eventSeperation * k), yPosition + yIndicatorOffset, evt.getColor());
+                                } else {
+                                    drawCircle(canvas, xPosition + (eventSeperation * k), yPosition, evt.getColor());
+                                }
+                            }
+                        }
+                    } else if(eventsList.Count == 1) {
+                        var evt = eventsList.ElementAt(0);
+                        if (!isSameDayAsCurrentDay) {
+                            if (_showSmallIndicator) {
+                                //draw small indicators below the day in the calendar
+                                drawSmallIndicatorCircle(canvas, xPosition, yPosition + yIndicatorOffset, evt.getColor());
+                            } else {
+                                drawCircle(canvas, xPosition, yPosition, evt.getColor());
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -777,6 +814,7 @@ namespace CompactCalendarView
                 if (dayRow == 0) {
                     // first row, so draw the first letter of the day
                     if (shouldDrawDaysHeader) {
+                        dayPaint.Color = new Color(calenderTextColor);
                         dayPaint.SetTypeface(Typeface.DefaultBold);
                         canvas.DrawText(dayColumnNames[dayColumn], xPosition, paddingHeight, dayPaint);
                         dayPaint.SetTypeface(Typeface.Default);

@@ -1,14 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
 
 namespace CompactCalendarView
 {
@@ -16,6 +6,12 @@ namespace CompactCalendarView
     {
         private long timeInMillis;
         private int color;
+
+        public CalendarDayEvent(DateTime dateTime, int color)
+        {
+            this.color = color;
+            this.timeInMillis = dateTime.GetTimeInMillis();
+        }
 
         public CalendarDayEvent(long timeInMillis, int color)
         {
@@ -38,7 +34,7 @@ namespace CompactCalendarView
             if (this == o) return true;
             if (o == null || o.GetType() != typeof(CalendarDayEvent)) return false;
 
-            var ev = (CalendarDayEvent) o;
+            var ev = (CalendarDayEvent)o;
 
             if (color != ev.color) return false;
             if (timeInMillis != ev.timeInMillis) return false;

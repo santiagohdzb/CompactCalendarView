@@ -1,19 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
 using Android.Content;
-using Android.OS;
-using Android.Runtime;
+using Android.Graphics;
+using Android.Support.V4.View;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
-using Android.Util;
-using Java.Util;
-using Android.Graphics;
 using Java.Lang;
-using Android.Support.V4.View;
+using Java.Util;
+using System.Collections.Generic;
 
 namespace CompactCalendarView
 {
@@ -33,7 +26,7 @@ namespace CompactCalendarView
 
         public class CalendarGestureListener : GestureDetector.SimpleOnGestureListener
         {
-            CompactCalendarView _context;
+            private CompactCalendarView _context;
             public CalendarGestureListener(CompactCalendarView context)
             {
                 _context = context;
@@ -71,32 +64,33 @@ namespace CompactCalendarView
             }
         }
 
-		public CompactCalendarView(Context context) : base(context, null)
+        public CompactCalendarView(Context context) : base(context, null)
         {
-			Setup(context, null, 0);
+            Setup(context, null, 0);
         }
 
         public CompactCalendarView(Context context, IAttributeSet attrs) : base(context, attrs, 0)
         {
-			Setup(context, attrs, 0);
+            Setup(context, attrs, 0);
         }
 
-        public CompactCalendarView(Context context, IAttributeSet attrs, int defStyleAttr): base(context, attrs, defStyleAttr)
+        public CompactCalendarView(Context context, IAttributeSet attrs, int defStyleAttr) : base(context, attrs, defStyleAttr)
         {
-			Setup(context, attrs, defStyleAttr);
+            Setup(context, attrs, defStyleAttr);
         }
 
-		public void Setup(Context context, IAttributeSet attrs, int defStyleAttr)
-		{
-			compactCalendarController = new CompactCalendarController(new Paint(), new OverScroller(context),
-			                                                          new Rect(), attrs, context, Color.Argb(255, 233, 84, 81),
-			                                                          Color.Argb(255, 64, 64, 64), Color.Argb(255, 219, 219, 219), VelocityTracker.Obtain());
-			gestureListener = new CalendarGestureListener(this);
-			gestureDetector = new GestureDetectorCompat(context, gestureListener);
-			animationHandler = new AnimationHandler(compactCalendarController, this);
-		}
+        private void Setup(Context context, IAttributeSet attrs, int defStyleAttr)
+        {
+            compactCalendarController = new CompactCalendarController(new Paint(), new OverScroller(context),
+                                                                      new Rect(), attrs, context, Color.Argb(255, 233, 84, 81),
+                                                                      Color.Argb(255, 64, 64, 64), Color.Argb(255, 219, 219, 219), VelocityTracker.Obtain());
+            gestureListener = new CalendarGestureListener(this);
+            gestureDetector = new GestureDetectorCompat(context, gestureListener);
+            animationHandler = new AnimationHandler(compactCalendarController, this);
+        }
 
-		public void setLocale(Java.Util.Locale locale) {
+        public void setLocale(Java.Util.Locale locale)
+        {
             compactCalendarController.setLocale(locale);
             Invalidate();
         }
@@ -189,7 +183,8 @@ namespace CompactCalendarView
          * or {@link #addEvents(java.util.List)}  when adding multiple events
          * @param event
          */
-        public void addEvent(CalendarDayEvent ev){
+        public void addEvent(CalendarDayEvent ev)
+        {
             addEvent(ev, false);
         }
 
@@ -199,9 +194,10 @@ namespace CompactCalendarView
          * @param event to be added to the calendar
          * @param shouldInvalidate true if the view should invalidate
          */
-        public void addEvent(CalendarDayEvent ev, bool shouldInvalidate){
+        public void addEvent(CalendarDayEvent ev, bool shouldInvalidate)
+        {
             compactCalendarController.addEvent(ev);
-            if(shouldInvalidate){
+            if (shouldInvalidate) {
                 Invalidate();
             }
         }
@@ -220,7 +216,8 @@ namespace CompactCalendarView
          * or {@link #removeEvents(java.util.List)} (java.util.List)}  when removing multiple events
          * @param event
          */
-        public void removeEvent(CalendarDayEvent ev){
+        public void removeEvent(CalendarDayEvent ev)
+        {
             removeEvent(ev, false);
         }
 
@@ -231,9 +228,10 @@ namespace CompactCalendarView
          * @param event event to remove from the calendar
          * @param shouldInvalidate true if the view should invalidate
          */
-        public void removeEvent(CalendarDayEvent ev, bool shouldInvalidate){
+        public void removeEvent(CalendarDayEvent ev, bool shouldInvalidate)
+        {
             compactCalendarController.removeEvent(ev);
-            if(shouldInvalidate){
+            if (shouldInvalidate) {
                 Invalidate();
             }
         }
@@ -254,7 +252,6 @@ namespace CompactCalendarView
         {
             compactCalendarController.removeAllEvents();
         }
-
 
         private void checkTargetHeight()
         {
@@ -329,11 +326,12 @@ namespace CompactCalendarView
             shouldScroll = shouldDisableScroll;
         }
 
-        public bool onTouchEvent(MotionEvent ev) {
-            compactCalendarController.onTouch(ev);
+        public override bool OnTouchEvent(MotionEvent e)
+        {
+            compactCalendarController.onTouch(e);
             Invalidate();
             // always allow gestureDetector to detect onSingleTap and scroll events
-            return gestureDetector.OnTouchEvent(ev);
+            return gestureDetector.OnTouchEvent(e);
         }
     }
 }
